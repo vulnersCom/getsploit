@@ -4,7 +4,7 @@ from __future__ import division
 
 __author__ = "Kir Ermakov <isox(at)vulners.com>"
 __copyright__ = "Copyright 2017, Vulners"
-__credits__ = ["Kir Ermakob", "Igor Bulatenko", "Gerome Fournier <jef(at)foutaise.org>"]
+__credits__ = ["Kir Ermakov", "Igor Bulatenko", "Gerome Fournier <jef(at)foutaise.org>"]
 __license__ = "LGPL"
 __version__ = "0.1"
 __maintainer__ = "Kir Ermakov"
