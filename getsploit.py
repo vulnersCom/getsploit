@@ -595,7 +595,7 @@ def getVulnersExploit(exploitId):
 def exploitSearch(query, lookupFields = None):
     # Build query
     if lookupFields:
-        searchQuery = "bulletinFamily:exploit AND (%s)" % " OR ".join("%s:%s" % (lField, query) for lField in lookupFields)
+        searchQuery = "bulletinFamily:exploit AND (%s)" % " OR ".join("%s:\"%s\"" % (lField, query) for lField in lookupFields)
     else:
         searchQuery = "bulletinFamily:exploit AND %s" % query
     searchResults = searchVulnersQuery(searchQuery).get('data')
