@@ -1,12 +1,12 @@
 # getsploit
 # Description
 Command line search and download tool for Vulners Database.
-It that also you to search online for the exploits across all the most popular collections: Exploit-DB, Metasploit, Packetstorm and others.
-The most powerful feature is immediate exploit download right in your working path.
+It allows you to search online for the exploits across all the most popular collections: *Exploit-DB*, *Metasploit*, *Packetstorm* and others.
+The most powerful feature is immediate *exploit source download* right in your working path.
 
 
 # Python version
-Utility was tested on a python2.6, python2.7, python3.5. If you found any bugs, don't hesitate to open issue
+Utility was tested on a *python2.6*, *python2.7*, *python3.6*. If you found any bugs, don't hesitate to open issue
 
 # How to use
 
