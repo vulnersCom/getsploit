@@ -18,9 +18,11 @@ except ImportError:
 import json
 import ssl
 import sys
-import unicodedata
 import urllib
 import platform
+import unicodedata
+import re
+import os
 
 pythonVersion = float(".".join(platform.python_version().split(".")[:2]))
 
@@ -540,6 +542,21 @@ class Texttable:
                 cell.extend([""] * (max_cell_lines - len(cell)))
         return line_wrapped
 
+def slugify(value):
+    """
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    """
+    if pythonVersion > 3.0:
+        value = re.sub('[^\w\s-]', '', value).strip().lower()
+        value = re.sub('[-\s]+', '-', value)
+        return value
+    import unicodedata
+    value = unicodedata.normalize('NFKD', unicode(value)).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = unicode(re.sub('[-\s]+', '-', value))
+    return value
+
 def getUrllibOpener():
     if pythonVersion > 2.6:
         ctx = ssl.create_default_context()
@@ -602,7 +619,7 @@ def main():
     addArgumentCall('-j', '--json', action='store_true',
                         help='Show result in JSON format.')
     addArgumentCall('-m', '--mirror', action='store_true',
-                        help='Mirror (aka copies) search result exploits to the current working directory.')
+                        help='Mirror (aka copies) search result exploit files to the subdirectory with your search query name.')
 
     if pythonVersion > 2.6:
         options = parser.parse_args()
@@ -625,8 +642,15 @@ def main():
         if options.json:
             jsonRows.append({'id':bulletin.get('id'), 'title':bulletin.get('title'), 'url':bulletinUrl})
         if options.mirror:
-            with open("%s.txt" % bulletin.get('id'), 'w') as exploitFile:
-                exploitFile.write(bulletin.get('sourceData') or bulletin.get('description'))
+            pathName = './%s' % slugify(searchQuery)
+            # Put results it the dir
+            if not os.path.exists(pathName):
+                os.mkdir(pathName)
+            with open("./%s/%s.txt" % (pathName,slugify(bulletin.get('id'))), 'w') as exploitFile:
+                exploitData = bulletin.get('sourceData') or bulletin.get('description')
+                if pythonVersion < 3.0:
+                    exploitData = exploitData.encode('utf-8').strip()
+                exploitFile.write(exploitData)
     if options.json:
         # Json output
         print(json.dumps(jsonRows))

@@ -10,6 +10,7 @@ Utility was tested on a *python2.6*, *python2.7*, *python3.6*. If you found any 
 
 # How to use
 
+# Search
 ```
 # git clone https://github.com/vulnersCom/getsploit
 # cd getsploit
@@ -49,4 +50,50 @@ Web-search URL: https://vulners.com/search?query=bulletinFamily%3Aexploit%20AND%
 |      SSV-92637       | WordPress REST API content     |        https://vulners.com/seebug/SSV-92637        |
 |                      | injection                      |                                                    |
 +----------------------+--------------------------------+----------------------------------------------------+
+```
+
+# Download
+```
+# ./getsploit.py -m wordpress 4.7.0
+Total found exploits: 8
+Web-search URL: https://vulners.com/search?query=bulletinFamily%3Aexploit%20AND%20wordpress%204.7.0
++----------------------+--------------------------------+----------------------------------------------------+
+|          ID          |         Exploit Title          |                        URL                         |
++======================+================================+====================================================+
+|  PACKETSTORM:141039  | WordPress 4.7.0 / 4.7.1 Insert | https://vulners.com/packetstorm/PACKETSTORM:141039 |
+|                      | PHP Code Injection             |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|     EDB-ID:41308     | WordPress 4.7.0/4.7.1 Plugin   |     https://vulners.com/exploitdb/EDB-ID:41308     |
+|                      | Insert PHP - PHP Code          |                                                    |
+|                      | Injection                      |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|     EDB-ID:41223     | WordPress 4.7.0/4.7.1 -        |     https://vulners.com/exploitdb/EDB-ID:41223     |
+|                      | Unauthenticated Content        |                                                    |
+|                      | Injection (PoC)                |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|  PACKETSTORM:140893  | WordPress 4.7.0 / 4.7.1 REST   | https://vulners.com/packetstorm/PACKETSTORM:140893 |
+|                      | API Privilege Escalation       |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|  PACKETSTORM:140902  | WordPress 4.7.0 / 4.7.1        | https://vulners.com/packetstorm/PACKETSTORM:140902 |
+|                      | Content Injection / Code       |                                                    |
+|                      | Execution                      |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|  PACKETSTORM:140901  | WordPress 4.7.0 / 4.7.1        | https://vulners.com/packetstorm/PACKETSTORM:140901 |
+|                      | Content Injection Proof Of     |                                                    |
+|                      | Concept                        |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|     EDB-ID:41224     | WordPress 4.7.0/4.7.1 -        |     https://vulners.com/exploitdb/EDB-ID:41224     |
+|                      | Unauthenticated Content        |                                                    |
+|                      | Injection Arbitrary Code       |                                                    |
+|                      | Execution                      |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+|      SSV-92637       | WordPress REST API content     |        https://vulners.com/seebug/SSV-92637        |
+|                      | injection                      |                                                    |
++----------------------+--------------------------------+----------------------------------------------------+
+
+# ls
+LICENSE         README.md       getsploit.py    wordpress-470
+# cd wordpress-470
+# ls
+edb-id41223.txt         edb-id41224.txt         edb-id41308.txt         packetstorm140893.txt   packetstorm140901.txt   packetstorm140902.txt   packetstorm141039.txt   ssv-92637.txt
 ```
