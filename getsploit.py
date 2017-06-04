@@ -628,7 +628,7 @@ def main():
         options, args = parser.parse_args()
         searchQuery = " ".join(args)
 
-    finalQuery, searchResults = exploitSearch(searchQuery, lookupFields=('title') if options.title else None)
+    finalQuery, searchResults = exploitSearch(searchQuery, lookupFields=['title'] if options.title else None)
     outputTable = Texttable()
     outputTable.set_cols_dtype(['t', 't', 't'])
     outputTable.set_cols_align(['c', 'l', 'c'])
