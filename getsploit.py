@@ -558,7 +558,7 @@ def slugify(value):
     return value
 
 def getUrllibOpener():
-    if pythonVersion > 2.6:
+    if pythonVersion > 3.0:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
