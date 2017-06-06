@@ -15,6 +15,7 @@ try:
     import urllib.request as urllib2
 except ImportError:
     import urllib2
+import urllib
 import json
 import ssl
 import sys
@@ -657,11 +658,11 @@ def main():
     else:
         # Text output
         print("Total found exploits: %s" % searchResults.get('total'))
-        if hasattr(urllib, 'pathname2url'):
-            pathname2urlHandler = urllib.pathname2url
+        if pythonVersion < 3:
+            quoteStringHandler = urllib.quote_plus
         else:
-            pathname2urlHandler = urllib2.pathname2url
-        print("Web-search URL: %s" % 'https://vulners.com/search?query=%s' % pathname2urlHandler(finalQuery))
+            quoteStringHandler = urllib.parse.quote_plus
+        print("Web-search URL: %s" % 'https://vulners.com/search?query=%s' % quoteStringHandler(finalQuery))
         # Set max coll width by len of the url for better copypaste
         maxWidth = max(len(element[2]) for element in tableRows)
         outputTable.set_cols_width([20, 30, maxWidth])
