@@ -4,9 +4,14 @@ from __future__ import division
 
 __author__ = "Kir Ermakov <isox(at)vulners.com>"
 __copyright__ = "Copyright 2017, Vulners"
-__credits__ = ["Kir Ermakov", "Igor Bulatenko", "Gerome Fournier <jef(at)foutaise.org>"]
+__credits__ = ["Kir Ermakov",
+               "Igor Bulatenko",
+               "Ivan Elkin",
+               "Gerome Fournier <jef(at)foutaise.org>",
+               "JBFC"
+               ]
 __license__ = "LGPL"
-__version__ = "0.1"
+__version__ = "0.2"
 __maintainer__ = "Kir Ermakov"
 __email__ = "isox@vulners.com"
 __status__ = "Alpha"
@@ -15,7 +20,6 @@ try:
     import urllib.request as urllib2
 except ImportError:
     import urllib2
-import urllib
 import json
 import ssl
 import sys
@@ -55,6 +59,17 @@ else:
     unicode_type = unicode
     bytes_type = str
 
+
+DBPATH, SCRIPTNAME = os.path.split(os.path.abspath(__file__))
+DBFILE = os.path.join(DBPATH, 'getsploit.db')
+
+try:
+    import sqlite3
+    import zipfile
+    LOCAL_SEARCH_AVAILABLE = True
+except:
+    LOCAL_SEARCH_AVAILABLE = False
+
 def obj2unicode(obj):
     """Return a unicode representation of a python object
     """
@@ -70,7 +85,7 @@ def obj2unicode(obj):
         return unicode_type(obj)
 
 
-def len(iterable):
+def lenNg(iterable):
     """Redefining len here so it will be able to work with non-ASCII characters
     """
     if isinstance(iterable, bytes_type) or isinstance(iterable, unicode_type):
@@ -143,7 +158,7 @@ class Texttable:
             ['-', '|', '+', '=']
         """
 
-        if len(array) != 4:
+        if lenNg(array) != 4:
             raise ArraySizeError("array should contain 4 characters")
         array = [ x[:1] for x in [ str(s) for s in array ] ]
         (self._char_horiz, self._char_vert,
@@ -306,7 +321,7 @@ class Texttable:
         for row in self._rows:
             length += 1
             out += self._draw_line(row)
-            if self._has_hlines() and length < len(self._rows):
+            if self._has_hlines() and length < lenNg(self._rows):
                 out += self._hline()
         if self._has_border():
             out += self._hline()
@@ -351,8 +366,8 @@ class Texttable:
         """
 
         if not self._row_size:
-            self._row_size = len(array)
-        elif self._row_size != len(array):
+            self._row_size = lenNg(array)
+        elif self._row_size != lenNg(array):
             raise ArraySizeError("array should contain %d elements" \
                 % self._row_size)
 
@@ -426,9 +441,9 @@ class Texttable:
         for line in cell_lines:
             length = 0
             parts = line.split('\t')
-            for part, i in zip(parts, list(range(1, len(parts) + 1))):
-                length = length + len(part)
-                if i < len(parts):
+            for part, i in zip(parts, list(range(1, lenNg(parts) + 1))):
+                length = length + lenNg(part)
+                if i < lenNg(parts):
                     length = (length//8 + 1) * 8
             maxi = max(maxi, length)
         return maxi
@@ -447,13 +462,13 @@ class Texttable:
         if self._header:
             maxi = [ self._len_cell(x) for x in self._header ]
         for row in self._rows:
-            for cell,i in zip(row, list(range(len(row)))):
+            for cell,i in zip(row, list(range(lenNg(row)))):
                 try:
                     maxi[i] = max(maxi[i], self._len_cell(cell))
                 except (TypeError, IndexError):
                     maxi.append(self._len_cell(cell))
 
-        ncols = len(maxi)
+        ncols = lenNg(maxi)
         content_width = sum(maxi)
         deco_width = 3*(ncols-1) + [0,4][self._has_border()]
         if self._max_width and (content_width + deco_width) > self._max_width:
@@ -491,14 +506,14 @@ class Texttable:
         line = self._splitit(line, isheader)
         space = " "
         out = ""
-        for i in range(len(line[0])):
+        for i in range(lenNg(line[0])):
             if self._has_border():
                 out += "%s " % self._char_vert
             length = 0
             for cell, width, align in zip(line, self._width, self._align):
                 length += 1
                 cell_line = cell[i]
-                fill = width - len(cell_line)
+                fill = width - lenNg(cell_line)
                 if isheader:
                     align = "c"
                 if align == "r":
@@ -508,7 +523,7 @@ class Texttable:
                             + int(fill/2 + fill%2) * space)
                 else:
                     out += cell_line + fill * space
-                if length < len(line):
+                if length < lenNg(line):
                     out += " %s " % [space, self._char_vert][self._has_vlines()]
             out += "%s\n" % ['', space + self._char_vert][self._has_border()]
         return out
@@ -534,13 +549,13 @@ class Texttable:
             if isheader:
                 valign = "t"
             if valign == "m":
-                missing = max_cell_lines - len(cell)
+                missing = max_cell_lines - lenNg(cell)
                 cell[:0] = [""] * int(missing / 2)
                 cell.extend([""] * int(missing / 2 + missing % 2))
             elif valign == "b":
-                cell[:0] = [""] * (max_cell_lines - len(cell))
+                cell[:0] = [""] * (max_cell_lines - lenNg(cell))
             else:
-                cell.extend([""] * (max_cell_lines - len(cell)))
+                cell.extend([""] * (max_cell_lines - lenNg(cell)))
         return line_wrapped
 
 def slugify(value):
@@ -558,22 +573,62 @@ def slugify(value):
     value = unicode(re.sub('[-\s]+', '-', value))
     return value
 
+
+def progress_callback_simple(downloaded,total):
+    sys.stdout.write(
+        "\r" +
+        (len(str(total)) - len(str(downloaded))) * " " + str(downloaded) + "/%d" % total +
+        " [%3.2f%%]" % (100.0 * float(downloaded) / float(total))
+    )
+    sys.stdout.flush()
+
+def downloadFile(srcurl, dstfilepath, progress_callback=None, block_size=8192):
+    def _download_helper(response, out_file, file_size):
+        if progress_callback!=None: progress_callback(0,file_size)
+        if block_size == None:
+            buffer = response.read()
+            out_file.write(buffer)
+
+            if progress_callback!=None: progress_callback(file_size,file_size)
+        else:
+            file_size_dl = 0
+            while True:
+                buffer = response.read(block_size)
+                if not buffer: break
+
+                file_size_dl += len(buffer)
+                out_file.write(buffer)
+
+                if progress_callback!=None: progress_callback(file_size_dl,file_size)
+    with open(dstfilepath,"wb") as out_file:
+        opener = getUrllibOpener()
+        req = urllib2.Request(srcurl)
+        if pythonVersion > 3:
+            with opener.open(req) as response:
+                file_size = int(response.getheader("Content-Length"))
+                _download_helper(response,out_file,file_size)
+        else:
+            response = opener.open(req)
+            meta = response.info()
+            file_size = int(meta.getheaders("Content-Length")[0])
+            _download_helper(response,out_file,file_size)
+
 def getUrllibOpener():
     if pythonVersion > 3.0:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
         opener = urllib2.build_opener(urllib2.HTTPSHandler(context=ctx))
-        opener.addheaders = [('Content-Type', 'application/json'),('User-Agent', 'vulners-searchsploit-v0.1')]
+        opener.addheaders = [('Content-Type', 'application/json'),('User-Agent', 'vulners-getsploit-v%s' % __version__)]
     else:
         opener = urllib2.build_opener(urllib2.HTTPSHandler())
-        opener.addheaders = [('Content-Type', 'application/json'), ('User-Agent', 'vulners-searchsploit-v0.1')]
+        opener.addheaders = [('Content-Type', 'application/json'), ('User-Agent', 'vulners-getsploit-v%s' % __version__)]
     return opener
 
 
-def searchVulnersQuery(searchQuery):
+def searchVulnersQuery(searchQuery, limit):
     vulnersApiLink = 'https://vulners.com/api/v3/search/lucene/'
-    vulnersSearchRequest = {"query":searchQuery, 'skip':0, 'size':10}
+    vulnersSearchRequest = {"query":searchQuery, 'skip':0, 'size':limit}
     req = urllib2.Request(vulnersApiLink)
     response = getUrllibOpener().open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
     responseData = response.read()
@@ -581,6 +636,18 @@ def searchVulnersQuery(searchQuery):
         responseData = responseData.decode('utf8')
     responseData = json.loads(responseData)
     return responseData
+
+def downloadVulnersGetsploitDB(path):
+    archiveFileName = os.path.join(path, 'getsploit.db.zip')
+    vulnersApiLink = 'https://vulners.com/api/v3/archive/getsploit/'
+    print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
+    downloadFile(vulnersApiLink, archiveFileName, progress_callback=progress_callback_simple)
+    print("Unpacking database.")
+    zip_ref = zipfile.ZipFile(archiveFileName, 'r')
+    zip_ref.extractall(DBPATH)
+    zip_ref.close()
+    os.remove(archiveFileName)
+    return True
 
 def getVulnersExploit(exploitId):
     vulnersApiLink = 'https://vulners.com/api/v3/search/id/'
@@ -593,15 +660,43 @@ def getVulnersExploit(exploitId):
     responseData = json.loads(responseData)
     return responseData
 
-def exploitSearch(query, lookupFields = None):
+def exploitSearch(query, lookupFields = None, limit = 10):
     # Build query
     if lookupFields:
         searchQuery = "bulletinFamily:exploit AND (%s)" % " OR ".join("%s:\"%s\"" % (lField, query) for lField in lookupFields)
     else:
         searchQuery = "bulletinFamily:exploit AND %s" % query
-    searchResults = searchVulnersQuery(searchQuery).get('data')
+    searchResults = searchVulnersQuery(searchQuery, limit).get('data')
     return searchQuery, searchResults
 
+def exploitLocalSearch(query, lookupFields = None, limit = 10):
+    # Build query
+    # CREATE VIRTUAL TABLE exploits USING FTS4(id text, title text, published DATE, description text, sourceData text, vhref text)
+    sqliteConnection = sqlite3.connect(DBFILE)
+    cursor = sqliteConnection.cursor()
+    # Check if FTS4 is supported
+    ftsok = False
+    for (val,) in cursor.execute('pragma compile_options'):
+        if val == 'ENABLE_FTS4':
+            ftsok = True
+    if not ftsok:
+        print("Your SQLite3 library does not support FTS4. Sorry, without this option local search will not work. Recompile SQLite3 with ENABLE_FTS4 option.")
+        exit()
+    searchRawResults = cursor.execute("SELECT * FROM exploits WHERE exploits MATCH ? LIMIT ?", ('"%s"' % query,limit)).fetchall()
+    searchCount = cursor.execute("SELECT Count(*) FROM exploits WHERE exploits MATCH ? LIMIT ?", ('"%s"' % query,limit)).fetchone()
+    searchResults = {'total':searchCount,'search':[]}
+    for element in searchRawResults:
+        searchResults['search'].append({'_source':
+                                               {'id':element[0],
+                                                'title':element[1],
+                                                'published':element[2],
+                                                'description':element[3],
+                                                'sourceData':element[4],
+                                                'vhref':element[5],
+                                                }
+                                        })
+    # Output must b
+    return query, searchResults
 
 def main():
     description = 'Exploit search and download utility'
@@ -613,7 +708,7 @@ def main():
         addArgumentCall = parser.add_option
     #
     if pythonVersion > 2.6:
-        addArgumentCall('query', metavar='query', type=str, nargs='+', help='Exploit search query. See https://vulners.com/help for the detailed manual.')
+        addArgumentCall('query', metavar='query', type=str, nargs='*', help='Exploit search query. See https://vulners.com/help for the detailed manual.')
     # Arguments
     addArgumentCall('-t', '--title', action='store_true',
                         help="Search JUST the exploit title (Default is description and source code).")
@@ -621,6 +716,13 @@ def main():
                         help='Show result in JSON format.')
     addArgumentCall('-m', '--mirror', action='store_true',
                         help='Mirror (aka copies) search result exploit files to the subdirectory with your search query name.')
+    addArgumentCall('-c', '--count', nargs=1, type=int, default=10,
+                        help='Search limit. Default 10.')
+    if LOCAL_SEARCH_AVAILABLE:
+        addArgumentCall('-l', '--local', action='store_true',
+                        help='Perform search in the local database instead of searching online.')
+        addArgumentCall('-u', '--update', action='store_true',
+                        help='Update getsploit.db database. Will be downloaded in the script path.')
 
     if pythonVersion > 2.6:
         options = parser.parse_args()
@@ -629,7 +731,30 @@ def main():
         options, args = parser.parse_args()
         searchQuery = " ".join(args)
 
-    finalQuery, searchResults = exploitSearch(searchQuery, lookupFields=['title'] if options.title else None)
+    if isinstance(options.count, list):
+        options.count = options.count[0]
+
+    # Update goes first
+    if LOCAL_SEARCH_AVAILABLE and options.update:
+        downloadVulnersGetsploitDB(DBPATH)
+        print("Database download complete. Now you may search exploits using --local key './getsploit.py -l wordpress 4.7'")
+        exit()
+
+    # Check that there is a query
+    if not searchQuery:
+        print("No search query provided. Type software name and version to find exploit.")
+        exit()
+
+
+    # Select propriate search method for the search. Local/remote
+    if LOCAL_SEARCH_AVAILABLE and options.local:
+        if not os.path.exists(DBFILE):
+            print("There is no local database file near getsploit. Run './getsploit.py --update'")
+            exit()
+        finalQuery, searchResults = exploitLocalSearch(searchQuery, lookupFields=['title'] if options.title else None, limit = options.count)
+    else:
+        finalQuery, searchResults = exploitSearch(searchQuery, lookupFields=['title'] if options.title else None, limit = options.count)
+
     outputTable = Texttable()
     outputTable.set_cols_dtype(['t', 't', 't'])
     outputTable.set_cols_align(['c', 'l', 'c'])
@@ -638,7 +763,7 @@ def main():
     jsonRows = []
     for bulletinSource in searchResults.get('search'):
         bulletin = bulletinSource.get('_source')
-        bulletinUrl = 'https://vulners.com/%s/%s' % (bulletin.get('type'), bulletin.get('id'))
+        bulletinUrl = bulletin.get('vref') or 'https://vulners.com/%s/%s' % (bulletin.get('type'), bulletin.get('id'))
         tableRows.append([bulletin.get('id'), bulletin.get('title'), bulletinUrl])
         if options.json:
             jsonRows.append({'id':bulletin.get('id'), 'title':bulletin.get('title'), 'url':bulletinUrl})

@@ -4,7 +4,6 @@ Command line search and download tool for [Vulners Database](https://vulners.com
 It allows you to search online for the exploits across all the most popular collections: *Exploit-DB*, *Metasploit*, *Packetstorm* and others.
 The most powerful feature is immediate *exploit source download* right in your working path.
 
-
 # Python version
 Utility was tested on a *python2.6*, *python2.7*, *python3.6*. If you found any bugs, don't hesitate to open issue
 
@@ -52,7 +51,7 @@ Web-search URL: https://vulners.com/search?query=bulletinFamily%3Aexploit%20AND%
 +----------------------+--------------------------------+----------------------------------------------------+
 ```
 
-# Download
+# Save exploit files
 ```
 # ./getsploit.py -m wordpress 4.7.0
 Total found exploits: 8
@@ -96,4 +95,16 @@ LICENSE         README.md       getsploit.py    wordpress-470
 # cd wordpress-470
 # ls
 edb-id41223.txt         edb-id41224.txt         edb-id41308.txt         packetstorm140893.txt   packetstorm140901.txt   packetstorm140902.txt   packetstorm141039.txt   ssv-92637.txt
+```
+
+# Local database
+If your Python supports sqlite3 lib(builtin) you can use *--update* and *--local* commands to download whole exploit database to your PC.
+After update you can perform local offline searches.
+
+```
+# ./getsploit.py --update
+Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.
+219642496/219642496 [100.00%]
+Unpacking database.
+Database download complete. Now you may search exploits using --local key './getsploit.py -l wordpress 4.7'
 ```
