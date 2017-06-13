@@ -682,8 +682,9 @@ def exploitLocalSearch(query, lookupFields = None, limit = 10):
     if not ftsok:
         print("Your SQLite3 library does not support FTS4. Sorry, without this option local search will not work. Recompile SQLite3 with ENABLE_FTS4 option.")
         exit()
-    searchRawResults = cursor.execute("SELECT * FROM exploits WHERE exploits MATCH ? LIMIT ?", ('"%s"' % query,limit)).fetchall()
-    searchCount = cursor.execute("SELECT Count(*) FROM exploits WHERE exploits MATCH ? LIMIT ?", ('"%s"' % query,limit)).fetchone()
+    preparedQuery = " AND ".join(['"%s"' % word for word in query.split()])
+    searchRawResults = cursor.execute("SELECT * FROM exploits WHERE exploits MATCH ? ORDER BY published LIMIT ?", ('%s' % preparedQuery,limit)).fetchall()
+    searchCount = cursor.execute("SELECT Count(*) FROM exploits WHERE exploits MATCH ? ORDER BY published LIMIT ?", ('%s' % preparedQuery,limit)).fetchone()
     searchResults = {'total':searchCount,'search':[]}
     for element in searchRawResults:
         searchResults['search'].append({'_source':
