@@ -677,7 +677,7 @@ def exploitLocalSearch(query, lookupFields = None, limit = 10):
     # Check if FTS4 is supported
     ftsok = False
     for (val,) in cursor.execute('pragma compile_options'):
-        if val == 'ENABLE_FTS4':
+        if 'FTS4' in val:
             ftsok = True
     if not ftsok:
         print("Your SQLite3 library does not support FTS4. Sorry, without this option local search will not work. Recompile SQLite3 with ENABLE_FTS4 option.")
