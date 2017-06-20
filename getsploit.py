@@ -642,7 +642,7 @@ def downloadVulnersGetsploitDB(path):
     vulnersApiLink = 'https://vulners.com/api/v3/archive/getsploit/'
     print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
     downloadFile(vulnersApiLink, archiveFileName, progress_callback=progress_callback_simple)
-    print("Unpacking database.")
+    print("\nUnpacking database.")
     zip_ref = zipfile.ZipFile(archiveFileName, 'r')
     zip_ref.extractall(DBPATH)
     zip_ref.close()

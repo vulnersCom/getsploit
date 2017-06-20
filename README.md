@@ -5,9 +5,11 @@ It allows you to search online for the exploits across all the most popular coll
 The most powerful feature is immediate *exploit source download* right in your working path.
 
 # Python version
-Utility was tested on a *python2.6*, *python2.7*, *python3.6*. If you found any bugs, don't hesitate to open issue
+Utility was tested on a *python2.6*, *python2.7*, *python3.6* with SQLite FTS4 support. If you have found any bugs, don't hesitate to open issue
 
 # How to use
+
+[![asciicast](https://asciinema.org/a/ObuaXdpxNO0nAo6o821fLCLxZ.png)](https://asciinema.org/a/ObuaXdpxNO0nAo6o821fLCLxZ?autoplay=1)
 
 # Search
 ```
