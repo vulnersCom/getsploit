@@ -1,7 +1,7 @@
 # getsploit
 
 [![Current Release](https://img.shields.io/github/release/vulnersCom/getsploit.svg "Current Release")](https://github.com/vulnersCom/getsploit/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/vulnersCom/getsploit/total.svg "Downloads")](https://github.com/vulnersCom/getsploit/releases) [![PayPal](https://img.shields.io/badge/donate-PayPal-green.svg)](paypal.me/videns)
+[![Downloads](https://img.shields.io/github/downloads/vulnersCom/getsploit/total.svg "Downloads")](https://github.com/vulnersCom/getsploit/releases) [![PayPal](https://img.shields.io/badge/donate-PayPal-green.svg)](https://paypal.me/videns)
 
 # Description
 Command line search and download tool for [Vulners Database](https://vulners.com) inspired by [searchsploit](https://github.com/offensive-security/exploit-database/blob/master/searchsploit).
