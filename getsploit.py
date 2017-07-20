@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import division
 
@@ -11,10 +11,10 @@ __credits__ = ["Kir Ermakov",
                "JBFC"
                ]
 __license__ = "LGPL"
-__version__ = "0.2"
+__version__ = "0.2.1"
 __maintainer__ = "Kir Ermakov"
 __email__ = "isox@vulners.com"
-__status__ = "Alpha"
+__status__ = "Release"
 
 try:
     import urllib.request as urllib2
@@ -28,6 +28,12 @@ import platform
 import unicodedata
 import re
 import os
+
+vulnersURL = {
+    'searchAPI' : 'https://vulners.com/api/v3/search/lucene/',
+    'updateAPI' : 'https://vulners.com/api/v3/archive/getsploit/',
+    'idAPI' : 'https://vulners.com/api/v3/search/id/',
+    }
 
 pythonVersion = float(".".join(platform.python_version().split(".")[:2]))
 
@@ -627,9 +633,8 @@ def getUrllibOpener():
 
 
 def searchVulnersQuery(searchQuery, limit):
-    vulnersApiLink = 'https://vulners.com/api/v3/search/lucene/'
     vulnersSearchRequest = {"query":searchQuery, 'skip':0, 'size':limit}
-    req = urllib2.Request(vulnersApiLink)
+    req = urllib2.Request(vulnersURL['searchAPI'])
     response = getUrllibOpener().open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
     responseData = response.read()
     if isinstance(responseData, bytes):
@@ -639,9 +644,8 @@ def searchVulnersQuery(searchQuery, limit):
 
 def downloadVulnersGetsploitDB(path):
     archiveFileName = os.path.join(path, 'getsploit.db.zip')
-    vulnersApiLink = 'https://vulners.com/api/v3/archive/getsploit/'
     print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
-    downloadFile(vulnersApiLink, archiveFileName, progress_callback=progress_callback_simple)
+    downloadFile(vulnersURL['updateAPI'], archiveFileName, progress_callback=progress_callback_simple)
     print("\nUnpacking database.")
     zip_ref = zipfile.ZipFile(archiveFileName, 'r')
     zip_ref.extractall(DBPATH)
@@ -650,9 +654,8 @@ def downloadVulnersGetsploitDB(path):
     return True
 
 def getVulnersExploit(exploitId):
-    vulnersApiLink = 'https://vulners.com/api/v3/search/id/'
     vulnersSearchRequest = {"id":exploitId}
-    req = urllib2.Request(vulnersApiLink)
+    req = urllib2.Request(vulnersURL['idAPI'])
     response = getUrllibOpener().open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
     responseData = response.read()
     if isinstance(responseData, bytes):
@@ -788,7 +791,7 @@ def main():
             quoteStringHandler = urllib.quote_plus
         else:
             quoteStringHandler = urllib.parse.quote_plus
-        print("Web-search URL: %s" % 'https://vulners.com/search?query=%s' % quoteStringHandler(finalQuery))
+        print("Web-search URL: https://vulners.com/search?query=%s" % quoteStringHandler(finalQuery))
         # Set max coll width by len of the url for better copypaste
         maxWidth = max(len(element[2]) for element in tableRows)
         outputTable.set_cols_width([20, 30, maxWidth])
