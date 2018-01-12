@@ -796,7 +796,12 @@ def main():
         maxWidth = max(len(element[2]) for element in tableRows)
         outputTable.set_cols_width([20, 30, maxWidth])
         outputTable.add_rows(tableRows)
-        print(outputTable.draw())
+        if pythonVersion < 3.0:
+            # Just pass non-ascii
+            print(outputTable.draw().decode('ascii', 'ignore'))
+        else:
+            # Any better solution here?
+            print(outputTable.draw().encode('ascii', 'ignore').decode())
 
 if __name__ == '__main__':
     main()
