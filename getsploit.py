@@ -798,7 +798,7 @@ def main():
         outputTable.add_rows(tableRows)
         if pythonVersion < 3.0:
             # Just pass non-ascii
-            print(outputTable.draw().decode('ascii', 'ignore'))
+            print(outputTable.draw().encode('ascii', 'ignore'))
         else:
             # Any better solution here?
             print(outputTable.draw().encode('ascii', 'ignore').decode())
