@@ -20,7 +20,7 @@ setup(
     packages=['getsploit'],
     version=getsploit.__version__,
     description='Command line search and download tool for Vulners Database \
-                 inspired by searchsploit.',
+inspired by searchsploit.',
     long_description=long_description,
     license='LGPLv3',
     url='https://github.com/vulnersCom/getsploit',
