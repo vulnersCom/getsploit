@@ -13,6 +13,8 @@ Utility was tested on a *python2.6*, *python2.7*, *python3.6* with SQLite FTS4 s
 
 # How to use
 
+Install: `pip install getsploit`
+
 [![asciicast](https://asciinema.org/a/ObuaXdpxNO0nAo6o821fLCLxZ.png)](https://asciinema.org/a/ObuaXdpxNO0nAo6o821fLCLxZ?autoplay=1)
 
 # Search
