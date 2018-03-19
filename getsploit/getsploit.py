@@ -576,7 +576,7 @@ def progress_callback_simple(downloaded,total):
     )
     sys.stdout.flush()
 
-def downloadFile(srcurl, dstfilepath, progress_callback=None, block_size=8192):
+def downloadFile(srcurl, dstfilepath, proxy, port, progress_callback=None, block_size=8192):
     def _download_helper(response, out_file, file_size):
         if progress_callback!=None: progress_callback(0,file_size)
         if block_size == None:
@@ -595,7 +595,7 @@ def downloadFile(srcurl, dstfilepath, progress_callback=None, block_size=8192):
 
                 if progress_callback!=None: progress_callback(file_size_dl,file_size)
     with open(dstfilepath,"wb") as out_file:
-        opener = getUrllibOpener()
+        opener = getUrllibOpener(proxy, port)
         req = urllib2.Request(srcurl)
         if pythonVersion > 3:
             with opener.open(req) as response:
@@ -607,12 +607,13 @@ def downloadFile(srcurl, dstfilepath, progress_callback=None, block_size=8192):
             file_size = int(meta.getheaders("Content-Length")[0])
             _download_helper(response,out_file,file_size)
 
-def getUrllibOpener():
+def getUrllibOpener(proxy, port):
     if pythonVersion > 3.0:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        opener = urllib2.build_opener(urllib2.HTTPSHandler(context=ctx))
+        proxy = urllib.request.ProxyHandler({'http': '%s:%d' % (proxy, port), 'https': '%s:%d' % (proxy, port)})
+        opener = urllib2.build_opener(urllib2.HTTPSHandler(context=ctx), proxy)
         opener.addheaders = [('Content-Type', 'application/json'),('User-Agent', 'vulners-getsploit-v%s' % __version__)]
     else:
         opener = urllib2.build_opener(urllib2.HTTPSHandler())
@@ -620,20 +621,20 @@ def getUrllibOpener():
     return opener
 
 
-def searchVulnersQuery(searchQuery, limit):
+def searchVulnersQuery(searchQuery, limit, proxy, port):
     vulnersSearchRequest = {"query":searchQuery, 'skip':0, 'size':limit}
     req = urllib2.Request(vulnersURL['searchAPI'])
-    response = getUrllibOpener().open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
+    response = getUrllibOpener(proxy, port).open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
     responseData = response.read()
     if isinstance(responseData, bytes):
         responseData = responseData.decode('utf8')
     responseData = json.loads(responseData)
     return responseData
 
-def downloadVulnersGetsploitDB(path):
+def downloadVulnersGetsploitDB(path, proxy, port):
     archiveFileName = os.path.join(path, 'getsploit.db.zip')
     print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
-    downloadFile(vulnersURL['updateAPI'], archiveFileName, progress_callback=progress_callback_simple)
+    downloadFile(vulnersURL['updateAPI'], archiveFileName, proxy, port, progress_callback=progress_callback_simple)
     print("\nUnpacking database.")
     zip_ref = zipfile.ZipFile(archiveFileName, 'r')
     zip_ref.extractall(DBPATH)
@@ -641,23 +642,23 @@ def downloadVulnersGetsploitDB(path):
     os.remove(archiveFileName)
     return True
 
-def getVulnersExploit(exploitId):
+def getVulnersExploit(exploitId, proxy, port):
     vulnersSearchRequest = {"id":exploitId}
     req = urllib2.Request(vulnersURL['idAPI'])
-    response = getUrllibOpener().open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
+    response = getUrllibOpener(proxy, port).open(req, json.dumps(vulnersSearchRequest).encode('utf-8'))
     responseData = response.read()
     if isinstance(responseData, bytes):
         responseData = responseData.decode('utf8')
     responseData = json.loads(responseData)
     return responseData
 
-def exploitSearch(query, lookupFields = None, limit = 10):
+def exploitSearch(query, proxy, port, lookupFields = None, limit = 10):
     # Build query
     if lookupFields:
         searchQuery = "bulletinFamily:exploit AND (%s)" % " OR ".join("%s:\"%s\"" % (lField, query) for lField in lookupFields)
     else:
         searchQuery = "bulletinFamily:exploit AND %s" % query
-    searchResults = searchVulnersQuery(searchQuery, limit).get('data')
+    searchResults = searchVulnersQuery(searchQuery, limit, proxy, port).get('data')
     return searchQuery, searchResults
 
 def exploitLocalSearch(query, lookupFields = None, limit = 10):
@@ -710,6 +711,9 @@ def main():
                         help='Mirror (aka copies) search result exploit files to the subdirectory with your search query name.')
     addArgumentCall('-c', '--count', nargs=1, type=int, default=10,
                         help='Search limit. Default 10.')
+    addArgumentCall('--proxy', type=str, help='Proxy address')
+    addArgumentCall('-p', '--port', type=int, default=3128, help='Remote proxy port. Default 3128.')
+
     if LOCAL_SEARCH_AVAILABLE:
         addArgumentCall('-l', '--local', action='store_true',
                         help='Perform search in the local database instead of searching online.')
@@ -728,7 +732,7 @@ def main():
 
     # Update goes first
     if LOCAL_SEARCH_AVAILABLE and options.update:
-        downloadVulnersGetsploitDB(DBPATH)
+        downloadVulnersGetsploitDB(DBPATH, proxy=options.proxy, port=options.port)
         print("Database download complete. Now you may search exploits using --local key './getsploit.py -l wordpress 4.7'")
         exit()
 
@@ -745,7 +749,7 @@ def main():
             exit()
         finalQuery, searchResults = exploitLocalSearch(searchQuery, lookupFields=['title'] if options.title else None, limit = options.count)
     else:
-        finalQuery, searchResults = exploitSearch(searchQuery, lookupFields=['title'] if options.title else None, limit = options.count)
+        finalQuery, searchResults = exploitSearch(searchQuery, lookupFields=['title'] if options.title else None, limit = options.count, proxy=options.proxy, port=options.port)
 
     outputTable = Texttable()
     outputTable.set_cols_dtype(['t', 't', 't'])
