@@ -638,6 +638,7 @@ def searchVulnersQuery(searchQuery, limit):
 def downloadVulnersGetsploitDB(path):
     archiveFileName = os.path.join(path, 'getsploit.db.zip')
     print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
+    print("Saving into:", DBFILE)
     downloadFile(vulnersURL['updateAPI'], archiveFileName, progress_callback=progress_callback_simple)
     print("\nUnpacking database.")
     zip_ref = zipfile.ZipFile(archiveFileName, 'r')
