@@ -16,6 +16,7 @@ import platform
 import unicodedata
 import re
 import os
+from pathlib import Path
 
 vulnersURL = {
     'searchAPI' : 'https://vulners.com/api/v3/search/lucene/',
@@ -54,8 +55,12 @@ else:
     bytes_type = str
 
 
-DBPATH, SCRIPTNAME = os.path.split(os.path.abspath(__file__))
+SCRIPTNAME = os.path.split(os.path.abspath(__file__))
+DBPATH = str(Path.home()) + '/.getsploit'
 DBFILE = os.path.join(DBPATH, 'getsploit.db')
+
+if not os.path.exists(DBPATH):
+	os.makedirs(DBPATH, exist_ok=True)
 
 try:
     import sqlite3
