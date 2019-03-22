@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from __future__ import division
-from __init__ import __version__
+
+__version__ = "0.3.0"
 
 import json
 import vulners
@@ -256,4 +256,5 @@ def main():
             print(outputTable.draw().encode('ascii', 'ignore').decode())
 
 if __name__ == '__main__':
+    from getsploit import __version__ as getsploit_version
     main()

@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import getsploit
+import re
 from setuptools import setup
+
+version = re.search(r'__version__\s*=\s*"(.+)"', open('getsploit/getsploit.py', 'rt').read()).group(1)
+
 
 long_description = '''
 getsploit
@@ -18,15 +21,15 @@ working path.
 setup(
     name='getsploit',
     packages=['getsploit'],
-    version=getsploit.__version__,
+    version=version,
     description='Command line search and download tool for Vulners Database \
 inspired by searchsploit.',
     long_description=long_description,
     license='LGPLv3',
     url='https://github.com/vulnersCom/getsploit',
-    author=getsploit.__author__,
-    author_email=getsploit.__email__,
-    maintainer=getsploit.__maintainer__,
+    author='Kirill Ermakov',
+    author_email='isox@vulners.com',
+    maintainer="Kir Ermakov",
     entry_points={
         'console_scripts': [
             'getsploit = getsploit.getsploit:main',
