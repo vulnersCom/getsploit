@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 import json
 import vulners
