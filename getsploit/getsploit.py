@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 import json
 import vulners
@@ -256,5 +256,4 @@ def main():
             print(outputTable.draw().encode('ascii', 'ignore').decode())
 
 if __name__ == '__main__':
-    from getsploit import __version__ as getsploit_version
     main()
