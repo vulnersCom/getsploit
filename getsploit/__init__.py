@@ -7,7 +7,7 @@ __credits__ = ["Kir Ermakov",
                "JBFC"
                ]
 __license__ = "LGPL"
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 __maintainer__ = "Kir Ermakov"
 __email__ = "isox@vulners.com"
 __status__ = "Release"

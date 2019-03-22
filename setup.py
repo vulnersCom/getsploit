@@ -32,6 +32,12 @@ inspired by searchsploit.',
             'getsploit = getsploit.getsploit:main',
         ]
     },
+    install_requires = [
+            'vulners',
+            'six',
+            'texttable',
+            'clint',
+        ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
