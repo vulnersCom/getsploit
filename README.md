@@ -15,13 +15,17 @@ Utility was tested on a *python2.6*, *python2.7*, *python3.6* with SQLite FTS4 s
 
 Install: `pip install getsploit`
 
-[![asciicast](https://asciinema.org/a/ObuaXdpxNO0nAo6o821fLCLxZ.png)](https://asciinema.org/a/ObuaXdpxNO0nAo6o821fLCLxZ?autoplay=1)
+# Obtain Vulners API key
+
+Please, register at [Vulners website](https://vulners.com).
+Go to the personal menu by clicking at your name at the right top corner.
+Follow "API KEYS" tab.
+Generate API key with scope "api" and use it with the getsploit.
 
 # Search
 ```
-# git clone https://github.com/vulnersCom/getsploit
-# cd getsploit
-# ./getsploit.py wordpress 4.7.0
+# pip install getsploit
+# getsploit wordpress 4.7.0
 Total found exploits: 8
 Web-search URL: https://vulners.com/search?query=bulletinFamily%3Aexploit%20AND%20wordpress%204.7.0
 +----------------------+--------------------------------+----------------------------------------------------+
@@ -61,7 +65,7 @@ Web-search URL: https://vulners.com/search?query=bulletinFamily%3Aexploit%20AND%
 
 # Save exploit files
 ```
-# ./getsploit.py -m wordpress 4.7.0
+# getsploit -m wordpress 4.7.0
 Total found exploits: 8
 Web-search URL: https://vulners.com/search?query=bulletinFamily%3Aexploit%20AND%20wordpress%204.7.0
 +----------------------+--------------------------------+----------------------------------------------------+
@@ -110,7 +114,7 @@ If your Python supports sqlite3 lib(builtin) you can use *--update* and *--local
 After update you can perform local offline searches.
 
 ```
-# ./getsploit.py --update
+# getsploit --update
 Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.
 219642496/219642496 [100.00%]
 Unpacking database.
