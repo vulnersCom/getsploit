@@ -136,25 +136,6 @@ def exploitLocalSearch(query, lookupFields = None, limit = 10):
 
 def main():
 
-    if not os.path.exists(KEYFILE):
-        print("To use getsploit you need to obtain Vulners API key at https://vulners.com")
-        api_key = six.moves.input("Please, enter API key: ")
-    else:
-        api_key = open(KEYFILE, 'r').readlines()[0].strip()
-    try:
-        vulners_lib = sploitVulners(api_key=api_key)
-    except ValueError as exc:
-        if "Wrong Vulners API key" in "%s" % exc and os.path.exists(KEYFILE):
-            os.unlink(KEYFILE)
-        raise exc
-
-    vulners_lib._Vulners__opener.headers.update({'User-Agent': 'Vulners Getsploit %s' % __version__})
-
-    with open(KEYFILE, 'w') as key_file:
-        key_file.write(api_key)
-
-    # Vulners key is OK, save it to the
-
     description = 'Exploit search and download utility'
     if six.PY2:
         parser = argparse.ArgumentParser(description)
@@ -190,6 +171,28 @@ def main():
 
     if isinstance(options.count, list):
         options.count = options.count[0]
+
+
+    # If it's not a local search, init API connection
+    if not options.local:
+        if not os.path.exists(KEYFILE):
+            print("To use getsploit you need to obtain Vulners API key at https://vulners.com")
+            api_key = six.moves.input("Please, enter API key: ")
+        else:
+            api_key = open(KEYFILE, 'r').readlines()[0].strip()
+        try:
+            vulners_lib = sploitVulners(api_key=api_key)
+        except ValueError as exc:
+            if "Wrong Vulners API key" in "%s" % exc and os.path.exists(KEYFILE):
+                os.unlink(KEYFILE)
+            raise exc
+
+        vulners_lib._Vulners__opener.headers.update({'User-Agent': 'Vulners Getsploit %s' % __version__})
+
+        with open(KEYFILE, 'w') as key_file:
+            key_file.write(api_key)
+
+        # Vulners key is OK, save it to the file
 
     # Update goes first
     if LOCAL_SEARCH_AVAILABLE and options.update:
