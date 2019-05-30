@@ -14,6 +14,7 @@ import urllib
 from six import string_types
 from clint.textui import progress
 from os.path import expanduser
+import errno
 
 if six.PY2:
     import argparse
@@ -34,7 +35,11 @@ DBFILE = os.path.join(DBPATH, 'getsploit.db')
 KEYFILE = os.path.join(DBPATH, 'vulners.key')
 
 if not os.path.exists(DBPATH):
-	os.makedirs(DBPATH, exist_ok=True)
+    try:
+        os.makedirs(DBPATH)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
 try:
     import sqlite3
