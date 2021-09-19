@@ -4,12 +4,12 @@
 [![Downloads](https://img.shields.io/github/downloads/vulnersCom/getsploit/total.svg "Downloads")](https://github.com/vulnersCom/getsploit/releases) [![PayPal](https://img.shields.io/badge/donate-PayPal-green.svg)](https://paypal.me/videns)
 
 # Description
-Command line search and download tool for [Vulners Database](https://vulners.com) inspired by [searchsploit](https://github.com/offensive-security/exploit-database/blob/master/searchsploit).
+Inspired by [searchsploit](https://github.com/offensive-security/exploit-database/blob/master/searchsploit), it combines two features: command line search and download tool.
 It allows you to search online for the exploits across all the most popular collections: *Exploit-DB*, *Metasploit*, *Packetstorm* and others.
 The most powerful feature is immediate *exploit source download* right in your working path.
 
 # Python version
-Utility was tested on a *python2.6*, *python2.7*, *python3.6* with SQLite FTS4 support. If you have found any bugs, don't hesitate to open issue
+Utility was tested on *python2.6*, *python2.7*, *python3.6* with SQLite FTS4 support. If you have found any bugs, don't hesitate to create an issue
 
 # How to use
 
@@ -18,7 +18,7 @@ Install: `pip install getsploit`
 # Obtain Vulners API key
 
 Please, register at [Vulners website](https://vulners.com).
-Go to the personal menu by clicking at your name at the right top corner.
+Go to the personal menu by clicking on your name in the right top corner.
 Follow "API KEYS" tab.
 Generate API key with scope "api" and use it with the getsploit.
 
