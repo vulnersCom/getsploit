@@ -58,26 +58,35 @@ class sploitVulners(vulners.Vulners):
         'searchsploitdb': "/api/v3/archive/getsploit/"
     }
 
-    def searchExploit(self, query, lookup_fields=None, limit=500, offset=0, fields=None):
+def searchExploit(self, query, lookup_fields=None, limit=500, offset=0, fields=None, vuln_type='exploit'):
+    """
+    Search exploit in vulners database by query string and lookup fields
+    :param query: string to search
+    :param lookup_fields: search in this fields only
+    :param limit: limit number of results
+    :param offset: offset results
+    :param fields: additional fields to fetch
+    :param vuln_type: type of vulnerability to search (exploit or vulnerability)
+    :return: search query and list of exploits
+    """
+    if lookup_fields:
+        if not isinstance(lookup_fields, (list, set, tuple)) or not all(isinstance(item, string_types) for item in lookup_fields):
+            raise TypeError('lookup_fields list is expected to be a list of strings')
+        searchQuery = "bulletinFamily:%s AND (%s)" % (vuln_type, " OR ".join(
+            "%s:\"%s\"" % (lField, query) for lField in lookup_fields))
+    else:
+        searchQuery = "bulletinFamily:%s AND %s" % (vuln_type, query)
 
-        if lookup_fields:
-            if not isinstance(lookup_fields, (list, set, tuple)) or not all(isinstance(item, string_types) for item in lookup_fields):
-                raise TypeError('lookup_fields list is expected to be a list of strings')
-            searchQuery = "bulletinFamily:exploit AND (%s)" % " OR ".join(
-                "%s:\"%s\"" % (lField, query) for lField in lookup_fields)
-        else:
-            searchQuery = "bulletinFamily:exploit AND %s" % query
+    total_bulletins = limit or self._Vulners__search(searchQuery, 0, 0, ['id']).get('total')
+    total = 0
+    dataDocs = []
 
-        total_bulletins = limit or self._Vulners__search(searchQuery, 0, 0, ['id']).get('total')
-        total = 0
-        dataDocs = []
-
-        for skip in range(offset, total_bulletins, min(self.search_size, limit or self.search_size)):
-            results = self._Vulners__search(searchQuery, skip, min(self.search_size, limit or self.search_size), fields or self.default_fields + ['sourceData'])
-            total = max(results.get('total'), total)
-            for element in results.get('search'):
-                dataDocs.append(element.get('_source'))
-        return searchQuery, dataDocs
+    for skip in range(offset, total_bulletins, min(self.search_size, limit or self.search_size)):
+        results = self._Vulners__search(searchQuery, skip, min(self.search_size, limit or self.search_size), fields or self.default_fields + ['sourceData'])
+        total = max(results.get('total'), total)
+        for element in results.get('search'):
+            dataDocs.append(element.get('_source'))
+    return searchQuery, dataDocs
 
     def downloadGetsploitDb(self, full_path):
         print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
@@ -161,11 +170,16 @@ def main():
                         help='Mirror (aka copies) search result exploit files to the subdirectory with your search query name.')
     addArgumentCall('-c', '--count', nargs=1, type=int, default=10,
                         help='Search limit. Default 10.')
+    addArgumentCall('-v', '--vendor', metavar='vendor', type=str,
+                    help='Search for exploits by vendor name.')
+    addArgumentCall('-s', '--version', metavar='version', type=str,
+                    help='Search for exploits by software version.')
+
     if LOCAL_SEARCH_AVAILABLE:
-        addArgumentCall('-l', '--local', action='store_true',
-                        help='Perform search in the local database instead of searching online.')
-        addArgumentCall('-u', '--update', action='store_true',
-                        help='Update getsploit.db database. Will be downloaded in the script path.')
+    addArgumentCall('-l', '--local', action='store_true',
+                    help='Perform search in the local database instead of searching online.')
+    addArgumentCall('-u', '--update', action='store_true',
+                    help='Update getsploit.db database. Will be downloaded in the script path.')
 
     if six.PY2:
         options = parser.parse_args()
