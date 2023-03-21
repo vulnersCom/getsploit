@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-__version__ = "0.3.3"
+__version__ = "1.0.0"
 
 import json
 import vulners
@@ -49,16 +49,25 @@ except:
     LOCAL_SEARCH_AVAILABLE = False
 
 
-class sploitVulners(vulners.Vulners):
+class sploitVulners(vulners.VulnersApi):
 
-    api_endpoints = {
-        'search': "/api/v3/search/lucene/",
-        'software': "/api/v3/burp/software/",
-        'apiKey': "/api/v3/apiKey/valid/",
-        'searchsploitdb': "/api/v3/archive/getsploit/"
-    }
+    default_fields = (
+        "id",
+        "title",
+        "description",
+        "type",
+        "bulletinFamily",
+        "cvss",
+        "published",
+        "modified",
+        "lastseen",
+        "href",
+        "sourceHref",
+        "sourceData",
+        "cvelist",
+    )
 
-    def searchExploit(self, query, lookup_fields=None, limit=500, offset=0, fields=None):
+    def searchExploit(self, query, lookup_fields=None, limit=500, offset=0, fields=default_fields):
 
         if lookup_fields:
             if not isinstance(lookup_fields, (list, set, tuple)) or not all(isinstance(item, string_types) for item in lookup_fields):
@@ -68,27 +77,16 @@ class sploitVulners(vulners.Vulners):
         else:
             searchQuery = "bulletinFamily:exploit AND %s" % query
 
-        total_bulletins = limit or self._Vulners__search(searchQuery, 0, 0, ['id']).get('total')
-        total = 0
-        dataDocs = []
+        dataDocs = self.find_all(searchQuery, offset=offset, limit=limit, fields=fields)
 
-        for skip in range(offset, total_bulletins, min(self.search_size, limit or self.search_size)):
-            results = self._Vulners__search(searchQuery, skip, min(self.search_size, limit or self.search_size), fields or self.default_fields + ['sourceData'])
-            total = max(results.get('total'), total)
-            for element in results.get('search'):
-                dataDocs.append(element.get('_source'))
         return searchQuery, dataDocs
 
     def downloadGetsploitDb(self, full_path):
         print("Downloading getsploit database archive. Please wait, it may take time. Usually around 5-10 minutes.")
-        # {'apiKey':self._Vulners__api_key}
-        download_request = self._Vulners__opener.get(self.vulners_urls['searchsploitdb'], stream = True)
+
+        download_request = self.getsploit()
         with open(full_path, 'wb') as f:
-            total_length = int(download_request.headers.get('content-length'))
-            for chunk in progress.bar(download_request.iter_content(chunk_size=1024), expected_size=(total_length / 1024) + 1):
-                if chunk:
-                    f.write(chunk)
-                    f.flush()
+            f.write(download_request)
         print("\nUnpacking database.")
         zip_ref = zipfile.ZipFile(full_path, 'r')
         zip_ref.extractall(DBPATH)
@@ -191,8 +189,6 @@ def main():
             if "Wrong Vulners API key" in "%s" % exc and os.path.exists(KEYFILE):
                 os.unlink(KEYFILE)
             raise exc
-
-        vulners_lib._Vulners__opener.headers.update({'User-Agent': 'Vulners Getsploit %s' % __version__})
 
         with open(KEYFILE, 'w') as key_file:
             key_file.write(api_key)
