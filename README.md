@@ -1,7 +1,7 @@
 # getsploit
 
 [![Current Release](https://img.shields.io/github/release/vulnersCom/getsploit.svg "Current Release")](https://github.com/vulnersCom/getsploit/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/vulnersCom/getsploit/total.svg "Downloads")](https://github.com/vulnersCom/getsploit/releases) [![PayPal](https://img.shields.io/badge/donate-PayPal-green.svg)](https://paypal.me/videns)
+[![Downloads](https://img.shields.io/github/downloads/vulnersCom/getsploit/total.svg "Downloads")](https://github.com/vulnersCom/getsploit/releases) 
 
 # Description
 Inspired by [searchsploit](https://github.com/offensive-security/exploit-database/blob/master/searchsploit), it combines two features: command line search and download tool.
@@ -9,7 +9,7 @@ It allows you to search online for the exploits across all the most popular coll
 The most powerful feature is immediate *exploit source download* right in your working path.
 
 # Python version
-Utility was tested on *python2.6*, *python2.7*, *python3.6* with SQLite FTS4 support. If you have found any bugs, don't hesitate to create an issue
+Utility was tested on *python2.7*, *python3.8+* with SQLite FTS4 support. If you have found any bugs, don't hesitate to create an issue
 
 # How to use
 
