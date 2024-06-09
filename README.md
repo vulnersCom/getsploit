@@ -4,7 +4,7 @@
 [![Downloads](https://img.shields.io/github/downloads/vulnersCom/getsploit/total.svg "Downloads")](https://github.com/vulnersCom/getsploit/releases) 
 
 # Description
-Inspired by [searchsploit](https://github.com/offensive-security/exploit-database/blob/master/searchsploit), it combines two features: command line search and download tool.
+Inspired by [searchsploit](https://gitlab.com/exploit-database/exploitdb/-/blob/main/searchsploit), it combines two features: command line search and download tool.
 It allows you to search online for the exploits across all the most popular collections: *Exploit-DB*, *Metasploit*, *Packetstorm* and others.
 The most powerful feature is immediate *exploit source download* right in your working path.
 
