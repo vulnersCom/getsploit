@@ -9,7 +9,7 @@ It allows you to search online for the exploits across all the most popular coll
 The most powerful feature is immediate *exploit source download* right in your working path.
 
 # Python version
-Utility was tested on *python2.7*, *python3.8+* with SQLite FTS4 support. If you have found any bugs, don't hesitate to create an issue
+Utility was tested on *python3.10+* with SQLite FTS4 support. If you have found any bugs, don't hesitate to create an issue
 
 # How to use
 

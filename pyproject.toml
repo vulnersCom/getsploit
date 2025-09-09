@@ -1,0 +1,56 @@
+[project]
+name = "getsploit"
+version = "2.0.1"
+requires-python = ">=3.10"
+description = "Command line search and download tool for Vulners Database inspired by searchsploit."
+readme = "README.md"
+authors = [
+    {name = "Vulners Team"}
+]
+license = { text = "GPL-3.0-or-later" }
+keywords = ["security", "network", "vulners", "vulnerability", "CVE"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Software Development :: Version Control",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "texttable (>=1.7.0, <2.0.0)",
+    "click (>=8.2.1, <9.0.0)",
+    "httpx (>=0.28.1, <1.0.0)",
+    "orjson (>=3.11.3, <4.0.0)",
+]
+
+[project.scripts]
+getsploit = "getsploit:main"
+
+[tool.poetry]
+packages = [
+    { include = "getsploit" },
+]
+
+[tool.poetry.group.dev.dependencies]
+mypy = { version = "^1.15.0", extras = ["faster-cache"] }
+ruff = "^0.11.8"
+
+[tool.mypy]
+follow_imports = "silent"
+no_namespace_packages = true
+disallow_untyped_defs = true
+strict = true
+extra_checks = true
+pretty = true
+
+[tool.ruff]
+line-length = 98
+target-version = "py313"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
