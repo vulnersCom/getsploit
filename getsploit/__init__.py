@@ -196,7 +196,6 @@ def main(
         table.set_cols_align(["c", "l", "c"])
         click.echo(f"Total found exploits: {len(rows)}")
         web_search_query = f"bulletinFamily:exploit AND ({query_value})"
-        print(web_search_query)
         click.echo(
             f"Web-search URL: https://vulners.com/search?query={urllib.parse.quote_plus(web_search_query)}"
         )
