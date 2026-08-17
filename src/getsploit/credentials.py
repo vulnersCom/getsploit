@@ -29,7 +29,14 @@ def load_api_key() -> str | None:
         # regular-file check below runs on the descriptor and is only reachable if the
         # open returns. It has no effect on reads from a regular file.
         flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
-        descriptor = os.open(path, flags)
+        try:
+            descriptor = os.open(path, flags)
+        except PermissionError as error:
+            # Windows refuses to open a directory at all, where POSIX opens it and lets
+            # the check below reject it. Report the same cause on both.
+            if path.is_dir():
+                raise CredentialError(f"API-key path is not a regular file: {path}") from error
+            raise
         try:
             if not stat.S_ISREG(os.fstat(descriptor).st_mode):
                 raise CredentialError(f"API-key path is not a regular file: {path}")

@@ -6,10 +6,11 @@
 online, or fully offline from a local index.**
 
 [![PyPI](https://img.shields.io/pypi/v/getsploit?logo=pypi&logoColor=white&label=PyPI&color=0073b7)](https://pypi.org/project/getsploit/)
-[![Downloads](https://img.shields.io/pypi/dm/getsploit?logo=python&logoColor=white&label=downloads&color=0073b7)](https://pypistats.org/packages/getsploit)
+[![Downloads](https://img.shields.io/pepy/dt/getsploit?logo=python&logoColor=white&label=downloads&color=0073b7)](https://pepy.tech/project/getsploit)
 [![Python](https://img.shields.io/pypi/pyversions/getsploit?logo=python&logoColor=white)](https://pypi.org/project/getsploit/)
-[![CI](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml/badge.svg)](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/vulnersCom/getsploit/actions/workflows/codeql.yml/badge.svg)](https://github.com/vulnersCom/getsploit/actions/workflows/codeql.yml)
+[![Stars](https://img.shields.io/github/stars/vulnersCom/getsploit?logo=github&logoColor=white)](https://github.com/vulnersCom/getsploit/stargazers)
+[![CI](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/vulnersCom/getsploit/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/vulnersCom/getsploit/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/vulnersCom/getsploit/badge)](https://scorecard.dev/viewer/?uri=github.com/vulnersCom/getsploit)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml)
 [![Typed](https://img.shields.io/badge/typing-PEP%20561-brightgreen)](https://peps.python.org/pep-0561/)
@@ -23,8 +24,8 @@ online, or fully offline from a local index.**
 [Architecture](ARCHITECTURE.md) ·
 [Security policy](SECURITY.md)
 
-<img src="https://raw.githubusercontent.com/vulnersCom/getsploit/master/docs/demo.svg"
-     alt="Getsploit searching online, building a local FTS5 index and searching it offline"
+<img src="https://raw.githubusercontent.com/vulnersCom/getsploit/master/docs/demo.gif"
+     alt="Getsploit searching online, building a local FTS5 index, then searching and mirroring offline"
      width="900">
 
 </div>

@@ -60,6 +60,40 @@ def test_load_rejects_non_regular_key_path(app_home: Path, tmp_path: Path) -> No
         load_api_key()
 
 
+def test_load_rejects_a_directory_it_cannot_even_open(
+    monkeypatch: pytest.MonkeyPatch, app_home: Path
+) -> None:
+    """Windows refuses to open a directory, so the check on the descriptor never runs.
+
+    Simulated rather than skipped on POSIX: the point is that both platforms report the
+    same cause, and a test that only runs on one of them cannot say that.
+    """
+    app_home.mkdir()
+    (app_home / "vulners.key").mkdir()
+
+    def refuse(*_args: object, **_kwargs: object) -> int:
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(os, "open", refuse)
+    with pytest.raises(CredentialError, match="not a regular file"):
+        load_api_key()
+
+
+def test_load_reports_an_unreadable_key_file(
+    monkeypatch: pytest.MonkeyPatch, app_home: Path
+) -> None:
+    """A refused open that is not a directory keeps its own cause."""
+    app_home.mkdir()
+    (app_home / "vulners.key").write_text("secret")  # pragma: allowlist secret
+
+    def refuse(*_args: object, **_kwargs: object) -> int:
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(os, "open", refuse)
+    with pytest.raises(CredentialError, match="Cannot read API key"):
+        load_api_key()
+
+
 def test_load_rejects_non_utf8_key_file(app_home: Path) -> None:
     app_home.mkdir()
     # PowerShell's `>` writes UTF-16, so a hand-made key file is a realistic input.
