@@ -53,6 +53,44 @@ jobs:
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      # The version and Python badges are static on purpose. A badge whose URL encodes
+      # its own value cannot be served stale: when the value changes so does the URL,
+      # where a live badge keeps showing the previous release for as long as the badge
+      # service caches it — six hours, in the case of its PyPI endpoints. The price is
+      # that the values must be kept honest, which is what this step is for.
+      - name: Verify the static badges match the release
+        env:
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          python3 - <<'PYTHON'
+          import os
+          import pathlib
+          import re
+          import sys
+          import tomllib
+          import urllib.parse
+
+          readme = pathlib.Path("README.md").read_text(encoding="utf-8")
+          project = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+
+          version = os.environ["VERSION"]
+          shown = re.search(r"badge/pypi-v([0-9][^-]*)-", readme)
+          if shown is None or shown.group(1) != version:
+              sys.exit(f"README PyPI badge shows {shown and shown.group(1)!r}, release is {version!r}")
+
+          supported = [
+              line.rsplit(" :: ", 1)[1]
+              for line in project["project"]["classifiers"]
+              if line.startswith("Programming Language :: Python :: 3.")
+          ]
+          badge = re.search(r"badge/python-([^?]*)-", readme)
+          decoded = badge and urllib.parse.unquote(badge.group(1))
+          listed = decoded and [part.strip() for part in decoded.split("|")]
+          if listed != supported:
+              sys.exit(f"README Python badge lists {listed}, classifiers say {supported}")
+          print(f"badges agree: v{version}, python {' | '.join(supported)}")
+          PYTHON
+
       - name: Run the full quality gate
         run: |
           uv sync --locked --all-groups --python 3.14

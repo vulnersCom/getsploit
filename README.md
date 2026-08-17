@@ -5,9 +5,9 @@
 **Search and download public exploits from the [Vulners](https://vulners.com) database —
 online, or fully offline from a local index.**
 
-[![PyPI](https://img.shields.io/pypi/v/getsploit?logo=pypi&logoColor=white&label=PyPI&color=0073b7)](https://pypi.org/project/getsploit/)
+[![PyPI](https://img.shields.io/badge/pypi-v3.0.0-0073b7?logo=pypi&logoColor=white)](https://pypi.org/project/getsploit/)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-0073b7?logo=python&logoColor=white)](https://pypi.org/project/getsploit/)
 [![Downloads](https://img.shields.io/pepy/dt/getsploit?logo=python&logoColor=white&label=downloads&color=0073b7)](https://pepy.tech/project/getsploit)
-[![Python](https://img.shields.io/pypi/pyversions/getsploit?logo=python&logoColor=white)](https://pypi.org/project/getsploit/)
 [![Stars](https://img.shields.io/github/stars/vulnersCom/getsploit?logo=github&logoColor=white)](https://github.com/vulnersCom/getsploit/stargazers)
 [![CI](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/vulnersCom/getsploit/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/vulnersCom/getsploit/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/vulnersCom/getsploit/actions/workflows/codeql.yml)
