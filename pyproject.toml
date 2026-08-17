@@ -40,7 +40,7 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.2,<9",
-    "rich>=14.2,<15",
+    "rich>=14.2,<16",
     "vulners>=4.1.0,<5",
 ]
 
