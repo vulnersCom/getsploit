@@ -69,7 +69,7 @@ lint = [
 security = ["detect-secrets>=1.5,<2"]
 release = [
     "check-wheel-contents>=0.6,<1",
-    "twine>=6.2,<7",
+    "twine>=6.2,<8",
 ]
 dev = [
     { include-group = "test" },
@@ -79,7 +79,7 @@ dev = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.11.29,<0.12"]
+requires = ["uv_build>=0.11.29,<0.13"]
 build-backend = "uv_build"
 
 [tool.pytest.ini_options]
