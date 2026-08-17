@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Nothing is granted by default; each job asks for exactly what it needs.
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          version: "0.11.33"
+      - run: >-
+          uv sync --locked --no-default-groups --group lint --group security --python 3.14
+      - run: >-
+          uv run --no-default-groups --group security --python 3.14
+          detect-secrets-hook $(git ls-files)
+      - run: uv run --no-default-groups --group lint --python 3.14 ruff format --check .
+      - run: uv run --no-default-groups --group lint --python 3.14 ruff check .
+      - run: uv run --no-default-groups --group lint --python 3.14 mypy
+
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.12" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: ubuntu-latest, python: "3.14" }
+          - { os: macos-latest, python: "3.14" }
+          - { os: windows-latest, python: "3.14" }
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          version: "0.11.33"
+      - run: >-
+          uv sync --locked --no-default-groups --group test --python "$PYTHON_VERSION"
+        shell: bash
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+      - run: >-
+          uv run --no-default-groups --group test --python "$PYTHON_VERSION"
+          pytest -q -n auto
+        shell: bash
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          version: "0.11.33"
+      - run: uv sync --locked --no-default-groups --group test --python 3.12
+      - run: >-
+          uv run --no-default-groups --group test --python 3.12 pytest -q -n auto
+          --cov=getsploit --cov-branch --cov-report=term-missing --cov-fail-under=100
+
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          version: "0.11.33"
+      - run: uv sync --locked --no-default-groups --group release --python 3.14
+      - run: uv build --no-sources
+      - run: >-
+          uv run --no-default-groups --group release --python 3.14 twine check dist/*
+      - run: >-
+          uv run --no-default-groups --group release --python 3.14
+          check-wheel-contents dist/*.whl
+      # Install and run the entry point: a wheel that imports nothing still reports
+      # its version quite happily.
+      - run: uvx --from ./dist/*.whl getsploit --version
+      - run: uvx --from ./dist/*.whl getsploit --help
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: getsploit-distributions
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: low
+          comment-summary-in-pr: on-failure

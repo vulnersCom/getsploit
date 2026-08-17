@@ -1,0 +1,34 @@
+name: Scorecard
+
+# OpenSSF Scorecard grades this repository's supply-chain posture: pinned actions,
+# branch protection, token permissions, signed releases. The result feeds the badge in
+# README.md and the code-scanning tab.
+on:
+  branch_protection_rule:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "23 4 * * 1"
+
+permissions: {}
+
+jobs:
+  analysis:
+    name: Analyze supply chain
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write # Publishes the result to the public Scorecard API for the badge.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+      - uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
+        with:
+          sarif_file: results.sarif

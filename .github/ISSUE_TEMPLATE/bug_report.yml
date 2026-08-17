@@ -1,0 +1,72 @@
+name: Bug report
+description: Something in Getsploit behaves differently from what it documents.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste your Vulners API key. If a command shows one, replace it with `***`.
+
+  - type: input
+    id: version
+    attributes:
+      label: Getsploit version
+      description: Output of `getsploit --version`.
+      placeholder: getsploit, version 3.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python and operating system
+      description: Output of `python -V` plus your OS and version.
+      placeholder: Python 3.13.2, macOS 15.3
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: The exact command, with any key redacted.
+      render: console
+      placeholder: $ getsploit --local "wordpress 4.7"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Full output or traceback. Terminal formatting is fine.
+      render: console
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: Search path
+      options:
+        - Online search
+        - Local database (--local)
+        - Database update (--update)
+        - Mirroring (--mirror)
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: status
+    attributes:
+      label: Local database status
+      description: Output of `getsploit --status`, if the problem involves the local index.
+      render: console

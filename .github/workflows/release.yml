@@ -1,0 +1,151 @@
+name: Release
+
+# Pushing a version tag is the whole release procedure. The tag is verified against the
+# project metadata and the changelog, the full quality gate runs again on the tagged
+# commit, and only then are the distributions published and the GitHub release created.
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Verify and build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Signs the build provenance attestation.
+      attestations: write
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          version: "0.11.33"
+
+      - name: Verify tag against project metadata
+        id: metadata
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="$(uv version --short)"
+          if [ "$RELEASE_TAG" != "v$version" ]; then
+            echo "::error::tag $RELEASE_TAG does not match project version $version"
+            exit 1
+          fi
+          if ! grep -Fq "## $version — " CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no section for $version"
+            exit 1
+          fi
+          if grep -Fq "## $version — Unreleased" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md still marks $version as Unreleased"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Run the full quality gate
+        run: |
+          uv sync --locked --all-groups --python 3.14
+          make release
+
+      # Installing and running the entry point, rather than only reading the metadata:
+      # a wheel that imports nothing still reports a version quite happily.
+      - name: Smoke-test both distributions
+        env:
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          set -euo pipefail
+          for distribution in dist/*.whl dist/*.tar.gz; do
+            uvx --from "$distribution" getsploit --version | grep -Fq "$VERSION"
+            uvx --from "$distribution" getsploit --help | grep -Fq -- --update
+          done
+
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/*
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: distributions
+          path: dist/*
+          if-no-files-found: error
+
+  pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/getsploit
+    permissions:
+      id-token: write # Exchanged for short-lived PyPI credentials; no API token exists.
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: distributions
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          attestations: true
+          print-hash: true
+
+  github-release:
+    name: Publish GitHub release
+    needs: [build, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: distributions
+          path: dist
+
+      - name: Extract the changelog section for this release
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          python3 - <<'PYTHON' > release-notes.md
+          import os
+          import pathlib
+          import sys
+
+          heading = f"## {os.environ['VERSION']} — "
+          inside = False
+          section = []
+          for line in pathlib.Path("CHANGELOG.md").read_text(encoding="utf-8").splitlines():
+              if line.startswith("## "):
+                  if inside:
+                      break
+                  inside = line.startswith(heading)
+                  continue
+              if inside:
+                  section.append(line)
+          notes = "\n".join(section).strip()
+          if not notes:
+              sys.exit(f"no changelog section found for {heading!r}")
+          print(notes)
+          PYTHON
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" dist/* \
+            --title "$RELEASE_TAG" \
+            --notes-file release-notes.md \
+            --verify-tag

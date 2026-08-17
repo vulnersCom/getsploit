@@ -1,0 +1,39 @@
+version: 2
+
+updates:
+  # Actions are pinned to commit SHAs, so only Dependabot can move them; without this
+  # they would silently stay on whatever SHA was current the day they were written.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    commit-message:
+      prefix: ci
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    commit-message:
+      prefix: deps
+    labels:
+      - dependencies
+      - python
+    # Runtime dependencies are few and load-bearing, so they arrive one pull request at
+    # a time and get their own CI run. Development tooling can travel together.
+    groups:
+      dev-tooling:
+        dependency-type: development
+        patterns: ["*"]

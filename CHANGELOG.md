@@ -1,49 +1,81 @@
-# 📦 Release Notes — `getsploit` v2.0.2
+# Changelog
 
-## ✅ Python Compatibility
-- Minimum supported Python version is now **3.10+**.
+All notable changes are documented here. The project follows
+[Semantic Versioning](https://semver.org/).
 
-## 🔐 API Key Management
-You can now provide your API key in several ways:
+## 3.0.0 — 2026-08-17
 
-1. Save the key for the current user:
-```bash
-   getsploit --set-key YOUR-KEY
-```
+### Added
 
-2. Alternatively, pass the key:
+- Asynchronous online search through the official Vulners Python SDK 4.1.
+- Adaptive Rich terminal output with table, compact, JSON, and JSONL modes.
+- Versioned SQLite FTS5 index with integrity checks and atomic replacement.
+- Local database status reporting.
+- Progress reporting for `--update`, replacing a single spinner that gave no sense of
+  how far a multi-gigabyte update had come. Download shows bytes and throughput,
+  unpacking and document conversion show a bar with totals and time remaining in their
+  own units, and the two steps with no measurable size stay indeterminate rather than
+  displaying a percentage they cannot know.
+- Hidden, atomic storage for the optional legacy API-key file.
+- Python 3.11–3.14 support and a reproducible `uv` lockfile.
+- Parallel tests with a 100% statement and branch coverage gate.
+- Secret detection and distribution validation in the release gate.
+- Token-free PyPI publishing through GitHub OIDC trusted publishing, triggered by
+  pushing a version tag, with signed build provenance and PEP 740 attestations on every
+  published artifact.
+- CodeQL analysis, OpenSSF Scorecard reporting, dependency review on pull requests, and
+  Dependabot updates for both actions and Python dependencies.
 
-   * via the `--api-key` command-line option
-   * or through the `VULNERS_API_KEY` environment variable
+### Changed
 
-**Key resolution priority:**
+- Migrated the package to a typed `src` layout and a small, boundary-oriented design.
+- Local FTS4 archives are converted to an external-content FTS5 index during update.
+- Rebuilt local indexes use FTS5 query syntax; FTS4 `NEAR/n` expressions require the
+  equivalent FTS5 `NEAR(...)` form.
+- Database archives download atomically through eight parallel range connections and
+  remain on disk throughout installation instead of being buffered in memory.
+- Mirrored files use exclusive, no-follow creation and never overwrite existing paths.
+- Project license changed from GPL-3.0-or-later to MIT.
+- JSON serialization now uses the Python standard library.
+- `--status` reports the database size in the same units as the progress bars. The two
+  used different conventions, so one database read as "1.5 GiB" in one place and
+  "1.7 GB" in the other.
 
-1. If `--api-key` is provided, it takes precedence.
-2. If not, the `VULNERS_API_KEY` environment variable is used.
-3. If neither is set, the saved key from `--set-key` is used.
+### Fixed
 
-## 🔍 Query Behavior
+- Local search accepts ordinary search words again. `wordpress 4.7`, `CVE-2024-3094`,
+  and `ms17-010` were rejected as malformed FTS5 expressions; deliberate FTS5
+  expressions still report their own parse errors.
+- `--count` above 100 returns the requested number of results. The search endpoint caps
+  a single response at 100 documents, so larger counts silently returned only the first
+  100; results are now paged, advancing by rows received rather than by the requested
+  limit, which would have skipped documents.
+- Result tables no longer discard the tail of long identifiers, titles and URLs. Those
+  columns wrap instead of being ellipsized, and `--status` shows the full database path.
+- Search URLs and mirror paths are no longer folded mid-token, so they stay copyable
+  when the terminal is narrower than the value.
+- A blank or whitespace-only query reports the usual usage error instead of surfacing a
+  `ValueError` traceback from the SDK.
+- An empty, zero or non-numeric `COLUMNS` no longer suppresses all output. Rich reports
+  a zero-width console for those values, which rendered nothing and still exited 0.
+- A missing API key names `VULNERS_API_KEY` and `--set-key` instead of the SDK's
+  `api_key=` argument, and is reported before any request is attempted.
+- A named pipe left at the API-key path no longer blocks the process forever; the
+  regular-file check is now reachable because the open cannot wait for a writer.
+- An API-key file that is not valid UTF-8, as written by PowerShell's `>`, reports a
+  credential error instead of an unhandled `UnicodeDecodeError`.
+- `--mirror` tolerates unbounded third-party identifiers and queries: names are capped
+  below the filesystem limit, where a long identifier previously aborted the whole run
+  after writing part of it.
+- `--mirror` no longer creates an empty directory when a search returns no results.
 
-* Search queries are now passed **as-is**, without modification.
+### Removed
 
-### 🔎 Search in title only:
+- The unsafe `--api-key VALUE` option; use `VULNERS_API_KEY` or `--set-key` instead.
+- Direct HTTP access to Vulners endpoints.
+- Runtime dependencies on `httpx`, `orjson`, and `texttable`.
 
-```bash
-getsploit title:wordpress AND title:"4.7.0"
-```
+## 2.0.2 — 2025-10-10
 
-### 🔎 Search across all fields:
-
-```bash
-getsploit wordpress sql injection
-```
-
-⚠️ When searching in the local database, queries must be compatible with **FTS4** (Full-Text Search v4).
-
-## 🏷 Available Search Fields
-
-* `id`
-* `title`
-* `description`
-* `sourceData`
-* `published`
+- Added Python 3.10 support and explicit API-key resolution.
+- Preserved raw query syntax for online and FTS4 searches.

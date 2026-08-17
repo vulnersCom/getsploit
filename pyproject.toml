@@ -1,56 +1,113 @@
 [project]
 name = "getsploit"
-version = "2.0.2"
-requires-python = ">=3.10"
-description = "Command line search and download tool for Vulners Database inspired by searchsploit."
+version = "3.0.0"
+description = "Fast exploit search for the Vulners database, online and offline."
 readme = "README.md"
-authors = [
-    {name = "Vulners Team"}
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Vulners Team", email = "info@vulners.com" }]
+keywords = [
+    "cve",
+    "exploit",
+    "exploit-database",
+    "exploitdb",
+    "infosec",
+    "metasploit",
+    "offensive-security",
+    "packetstorm",
+    "pentesting",
+    "security",
+    "vulnerability",
+    "vulners",
 ]
-license = { text = "GPL-3.0-or-later" }
-keywords = ["security", "network", "vulners", "vulnerability", "CVE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Intended Audience :: Developers",
+    "Environment :: Console",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Topic :: Software Development :: Version Control",
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Security",
+    "Topic :: System :: Systems Administration",
     "Topic :: Utilities",
+    "Typing :: Typed",
 ]
 dependencies = [
-    "texttable (>=1.7.0, <2.0.0)",
-    "click (>=8.2.1, <9.0.0)",
-    "httpx (>=0.28.1, <1.0.0)",
-    "orjson (>=3.11.3, <4.0.0)",
+    "click>=8.2,<9",
+    "rich>=14.2,<15",
+    "vulners>=4.1.0,<5",
 ]
+
+[project.urls]
+Homepage = "https://github.com/vulnersCom/getsploit"
+Changelog = "https://github.com/vulnersCom/getsploit/blob/master/CHANGELOG.md"
+Documentation = "https://github.com/vulnersCom/getsploit#readme"
+Issues = "https://github.com/vulnersCom/getsploit/issues"
+Repository = "https://github.com/vulnersCom/getsploit"
+"Vulners API key" = "https://vulners.com/userinfo"
 
 [project.scripts]
-getsploit = "getsploit:main"
+getsploit = "getsploit.cli:main"
 
-[tool.poetry]
-packages = [
-    { include = "getsploit" },
+[dependency-groups]
+test = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=5",
+    "pytest-xdist>=3.6",
+]
+lint = [
+    "mypy>=1.15",
+    "ruff>=0.11.8",
+]
+security = ["detect-secrets>=1.5,<2"]
+release = [
+    "check-wheel-contents>=0.6,<1",
+    "twine>=6.2,<7",
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    { include-group = "security" },
+    { include-group = "release" },
 ]
 
-[tool.poetry.group.dev.dependencies]
-mypy = { version = "^1.15.0", extras = ["faster-cache"] }
-ruff = "^0.11.8"
+[build-system]
+requires = ["uv_build>=0.11.29,<0.12"]
+build-backend = "uv_build"
 
-[tool.mypy]
-follow_imports = "silent"
-no_namespace_packages = true
-disallow_untyped_defs = true
-strict = true
-extra_checks = true
-pretty = true
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers", "-ra"]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["getsploit"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", "if __name__ == .__main__.:"]
 
 [tool.ruff]
 line-length = 98
-target-version = "py313"
+target-version = "py311"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff.lint]
+select = ["A", "ASYNC", "B", "C4", "E", "F", "I", "N", "PERF", "PIE", "PL", "PTH", "RUF", "SIM", "UP", "W"]
+ignore = ["PLR2004"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+pretty = true
+files = ["src", "tests"]

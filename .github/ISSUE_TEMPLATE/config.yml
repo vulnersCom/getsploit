@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/vulnersCom/getsploit/security/policy
+    about: Report privately instead of opening an issue. Never post a working exploit here.
+  - name: Vulners API key, quota or account
+    url: https://vulners.com/userinfo
+    about: Key management and plan limits live in your Vulners account, not in this repository.
+  - name: Missing or wrong exploit data
+    url: https://vulners.com/search
+    about: Getsploit only queries the Vulners database; content issues belong to Vulners itself.
