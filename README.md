@@ -5,7 +5,7 @@
 **Search and download public exploits from the [Vulners](https://vulners.com) database —
 online, or fully offline from a local index.**
 
-[![PyPI](https://img.shields.io/badge/pypi-v3.0.0-0073b7?logo=pypi&logoColor=white)](https://pypi.org/project/getsploit/)
+[![PyPI](https://img.shields.io/badge/pypi-v3.0.1-0073b7?logo=pypi&logoColor=white)](https://pypi.org/project/getsploit/)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-0073b7?logo=python&logoColor=white)](https://pypi.org/project/getsploit/)
 [![Downloads](https://img.shields.io/pepy/dt/getsploit?logo=python&logoColor=white&label=downloads&color=0073b7)](https://pepy.tech/project/getsploit)
 [![Stars](https://img.shields.io/github/stars/vulnersCom/getsploit?logo=github&logoColor=white)](https://github.com/vulnersCom/getsploit/stargazers)

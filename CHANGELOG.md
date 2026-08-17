@@ -3,6 +3,21 @@
 All notable changes are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 3.0.1 — 2026-08-17
+
+The installed package is identical to 3.0.0. This release exists to correct the project
+page, which is rendered from the README as it stood at the previous tag.
+
+### Changed
+
+- The version and Python badges are static badges whose URL carries their own value.
+  They were live queries whose answers are cached for six hours, so immediately after a
+  release — exactly when the page is read — they still advertised the previous version.
+  Counters that are genuinely live, such as downloads and stars, stay live.
+- The release workflow refuses to publish when those badge values disagree with the
+  project version or with the Python classifiers, since a static value can drift where a
+  query cannot.
+
 ## 3.0.0 — 2026-08-17
 
 ### Added

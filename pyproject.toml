@@ -1,6 +1,6 @@
 [project]
 name = "getsploit"
-version = "3.0.0"
+version = "3.0.1"
 description = "Fast exploit search for the Vulners database, online and offline."
 readme = "README.md"
 requires-python = ">=3.11"
