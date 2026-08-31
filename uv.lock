@@ -1879,7 +1879,7 @@ wheels = [
 
 [[package]]
 name = "vulners"
-version = "4.1.0"
+version = "4.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "brotli" },
@@ -1894,9 +1894,9 @@ dependencies = [
     { name = "typing-inspection" },
     { name = "zstandard" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/a1/d0c7986cac03bfcd7520c24d5679a05ae44ad77ce5ddd1d1dd0f0968834e/vulners-4.1.0.tar.gz", hash = "sha256:6c10821243deeec2eb2b0aa828c21e073418fbefd3368a710771639cb728ad5b", size = 173959, upload-time = "2026-08-17T11:19:32.389Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/98/72611cd450669c139570e428664f64ef63811014e24e00dbf258aa783caa/vulners-4.3.0.tar.gz", hash = "sha256:2b642116140cbfc7f56361147c89debf842c8b03f0a8412a0899f3b16d8aaf7e", size = 179391, upload-time = "2026-08-21T08:58:29.581Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/8d/ddcfc6286a6ef3963c826d9f04191c98871273d7fb9b52a29c839e27bb0d/vulners-4.1.0-py3-none-any.whl", hash = "sha256:0993d83c01765c282232d61fe24a84daab98f667b1fb633bf6e9272dfea65729", size = 226686, upload-time = "2026-08-17T11:19:31.022Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/29/a2a6f86cd4d614310dff780e028f0dd97fcef784031e547b0bff6fe7fffb/vulners-4.3.0-py3-none-any.whl", hash = "sha256:15aa40ec3604ca734a87bf9b369ff46ab767983ad1a2d6b93bf206d8c763683e", size = 231958, upload-time = "2026-08-21T08:58:28.116Z" },
 ]
 
 [[package]]
